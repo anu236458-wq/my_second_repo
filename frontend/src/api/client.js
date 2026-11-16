@@ -234,6 +234,26 @@ function mockApiHandler(endpoint, options = {}) {
     return { success: true, data: fee };
   }
 
+  // Dashboard Absent Grouped
+  if (path === '/dashboard/absent-grouped') {
+    return { success: true, data: [] };
+  }
+
+  // Fees defaulters
+  if (path === '/fees/defaulters') {
+    const defaulters = store.fees.filter(f => f.status !== 'Paid');
+    return { success: true, data: defaulters };
+  }
+
+  // Delete teacher
+  if (path.startsWith('/teachers/') && method === 'DELETE') {
+    const id = Number(path.replace('/teachers/', ''));
+    const t = store.teachers.find(t => t.id === id);
+    if (t) t.status = 'inactive';
+    saveLocalStore(store);
+    return { success: true, message: 'Teacher removed' };
+  }
+
   // Settings
   if (path === '/settings') {
     if (method === 'PUT') {
@@ -284,7 +304,12 @@ export const api = {
   updateStudent: (id, data) => request(`/students/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteStudent: (id) => request(`/students/${id}`, { method: 'DELETE' }),
   getTeachers: () => request('/teachers'),
-  createTeacher: (data) => request('/teachers', { method: 'POST', body: JSON.stringify(data) }),
+  deleteTeacher: (id) => request(`/teachers/${id}`, { method: 'DELETE' }),
+  getDashboardAbsentGrouped: (date) => request(`/dashboard/absent-grouped?date=${date}`),
+  getDefaulters: (params = {}) => {
+    const q = new URLSearchParams(params).toString();
+    return request(`/fees/defaulters${q ? `?${q}` : ''}`);
+  },
   getBatchRoster: (batchId, date) => request(`/attendance/batch-roster?batch_id=${batchId}&date=${date}`),
   submitAttendance: (batchId, date, records) => request('/attendance/submit', { method: 'POST', body: JSON.stringify({ batch_id: batchId, date, records }) }),
   getAbsentList: (batchId, date) => request(`/attendance/absent-list?batch_id=${batchId}&date=${date}`),
