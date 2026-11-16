@@ -1,7 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from './context/AuthContext';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import LoginPage from './pages/LoginPage';
 import MarkAttendancePage from './pages/MarkAttendancePage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
 import BatchesPage from './pages/BatchesPage';
@@ -11,36 +9,14 @@ import SettingsPage from './pages/SettingsPage';
 import FeeTrackingPage from './pages/FeeTrackingPage';
 
 export default function App() {
-  const { user, loading, isAdmin } = useAuth();
-  const [activeTab, setActiveTab] = useState('attendance');
-
-  useEffect(() => {
-    if (user) {
-      setActiveTab(isAdmin ? 'dashboard' : 'attendance');
-    }
-  }, [user, isAdmin]);
-
-  if (loading) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-main)' }}>
-        <div style={{ textAlign: 'center', color: 'var(--primary)', fontWeight: 700 }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '8px' }}>🎓</div>
-          Loading Apex Institute...
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <LoginPage />;
-  }
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   return (
     <div className="app-container">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <main className="main-content">
-        {activeTab === 'dashboard' && isAdmin && (
+        {activeTab === 'dashboard' && (
           <AdminDashboardPage setActiveTab={setActiveTab} />
         )}
 
@@ -48,24 +24,24 @@ export default function App() {
           <MarkAttendancePage />
         )}
 
-        {activeTab === 'batches' && isAdmin && (
+        {activeTab === 'batches' && (
           <BatchesPage />
         )}
 
-        {activeTab === 'students' && isAdmin && (
+        {activeTab === 'students' && (
           <StudentsPage />
         )}
 
-        {activeTab === 'teachers' && isAdmin && (
+        {activeTab === 'teachers' && (
           <TeachersPage />
         )}
 
-        {activeTab === 'settings' && isAdmin && (
-          <SettingsPage />
+        {activeTab === 'fees' && (
+          <FeeTrackingPage />
         )}
 
-        {activeTab === 'fees' && isAdmin && (
-          <FeeTrackingPage />
+        {activeTab === 'settings' && (
+          <SettingsPage />
         )}
       </main>
     </div>

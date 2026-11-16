@@ -31,7 +31,7 @@ const translations = {
     quickFillTeacher: 'Demo: Login as Teacher (Rahul)',
     attendanceRate: 'Attendance Rate',
     todayOverview: "Today's Attendance Overview",
-    noAbsentToday: 'No absent students in this batch today! 🎉'
+    noAbsentToday: 'No absent students in this batch today!'
   },
   hi: {
     appTitle: 'एपेक्स इंस्टिट्यूट',
