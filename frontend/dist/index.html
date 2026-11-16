@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apex Institute</title>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --sky: #35A9FF; --elec: #1555D9; --white: #fff;
+    --clay-bg: linear-gradient(135deg, #e8f4ff 0%, #f0f7ff 50%, #e0eeff 100%);
+    --glass: rgba(255,255,255,0.72);
+    --shadow-clay: 0 8px 32px rgba(53,169,255,.18), 0 2px 8px rgba(21,85,217,.12), inset 0 1px 0 rgba(255,255,255,.9);
+    --shadow-btn: 0 6px 20px rgba(21,85,217,.30), 0 2px 6px rgba(21,85,217,.18), inset 0 1px 0 rgba(255,255,255,.35);
+    --radius: 18px; --radius-sm: 10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+  body{background:var(--clay-bg);min-height:100vh;color:#1a1a2e}
+  /* Navbar */
+  .navbar{position:sticky;top:0;z-index:100;background:var(--glass);backdrop-filter:blur(18px);border-bottom:1px solid rgba(53,169,255,.2);padding:0 24px;height:60px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 16px rgba(53,169,255,.12)}
+  .nav-brand{font-weight:800;font-size:1.1rem;color:var(--elec);letter-spacing:-.3px}
+  .nav-brand span{color:var(--sky)}
+  .nav-tabs{display:flex;gap:4px}
+  .nav-tab{padding:6px 14px;border-radius:8px;border:none;background:transparent;cursor:pointer;font-size:.82rem;font-weight:600;color:#64748b;transition:.2s}
+  .nav-tab:hover{background:rgba(53,169,255,.1);color:var(--elec)}
+  .nav-tab.active{background:linear-gradient(135deg,var(--elec),var(--sky));color:#fff;box-shadow:0 3px 10px rgba(21,85,217,.3)}
+  .nav-right{display:flex;align-items:center;gap:10px}
+  .role-badge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+  .badge-admin{background:linear-gradient(135deg,var(--elec),var(--sky));color:#fff}
+  .badge-teacher{background:linear-gradient(135deg,#059669,#10b981);color:#fff}
+  .btn-logout{padding:5px 12px;border-radius:8px;border:1.5px solid rgba(21,85,217,.25);background:transparent;cursor:pointer;font-size:.78rem;font-weight:600;color:var(--elec);transition:.2s}
+  .btn-logout:hover{background:var(--elec);color:#fff}
+  /* Cards */
+  .card{background:var(--glass);backdrop-filter:blur(12px);border-radius:var(--radius);box-shadow:var(--shadow-clay);border:1px solid rgba(255,255,255,.8);padding:24px}
+  .stat-card{background:var(--glass);backdrop-filter:blur(12px);border-radius:var(--radius);box-shadow:var(--shadow-clay);border:1px solid rgba(255,255,255,.8);padding:20px;text-align:center}
+  .stat-num{font-size:2rem;font-weight:800;color:var(--elec);line-height:1}
+  .stat-label{font-size:.78rem;color:#64748b;font-weight:600;margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+  /* Buttons */
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius:12px;border:none;font-weight:700;font-size:.85rem;cursor:pointer;transition:.2s;text-decoration:none}
+  .btn-primary{background:linear-gradient(135deg,var(--elec) 0%,var(--sky) 100%);color:#fff;box-shadow:var(--shadow-btn)}
+  .btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(21,85,217,.4)}
+  .btn-danger{background:linear-gradient(135deg,#dc2626,#ef4444);color:#fff;box-shadow:0 4px 14px rgba(220,38,38,.3)}
+  .btn-ghost{background:rgba(53,169,255,.1);color:var(--elec);border:1.5px solid rgba(53,169,255,.3)}
+  .btn-sm{padding:5px 12px;font-size:.77rem;border-radius:8px}
+  .btn-xs{padding:3px 8px;font-size:.72rem;border-radius:6px}
+  /* Inputs */
+  input,select,textarea{width:100%;padding:10px 14px;border-radius:var(--radius-sm);border:1.5px solid rgba(53,169,255,.25);background:rgba(255,255,255,.8);font-size:.88rem;color:#1a1a2e;outline:none;transition:.2s;box-shadow:inset 0 2px 6px rgba(21,85,217,.06)}
+  input:focus,select:focus,textarea:focus{border-color:var(--sky);box-shadow:0 0 0 3px rgba(53,169,255,.15),inset 0 2px 6px rgba(21,85,217,.06)}
+  label{font-size:.78rem;font-weight:700;color:#374151;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px}
+  .form-group{margin-bottom:16px}
+  /* Table */
+  table{width:100%;border-collapse:collapse}
+  th{padding:10px 14px;text-align:left;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#64748b;border-bottom:2px solid rgba(53,169,255,.15)}
+  td{padding:12px 14px;border-bottom:1px solid rgba(53,169,255,.08);font-size:.85rem;vertical-align:middle}
+  tr:hover td{background:rgba(53,169,255,.04)}
+  /* Avatar */
+  .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;color:#fff;flex-shrink:0}
+  /* Pills */
+  .pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700}
+  .pill-blue{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+  .pill-green{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+  .pill-orange{background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA}
+  .pill-gray{background:#F1F5F9;color:#475569;border:1px solid #CBD5E1}
+  /* Modal */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:16px}
+  .modal{background:#fff;border-radius:22px;box-shadow:0 24px 64px rgba(0,0,0,.2);width:100%;max-width:560px;max-height:90vh;overflow-y:auto}
+  .modal-header{padding:20px 24px 16px;border-bottom:1px solid rgba(53,169,255,.12);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;border-radius:22px 22px 0 0}
+  .modal-title{font-size:1.05rem;font-weight:800;color:var(--elec)}
+  .modal-body{padding:20px 24px}
+  .modal-footer{padding:16px 24px;border-top:1px solid rgba(53,169,255,.12);display:flex;gap:10px;justify-content:flex-end}
+  .close-btn{width:32px;height:32px;border-radius:50%;border:none;background:rgba(239,68,68,.1);color:#dc2626;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;transition:.2s}
+  .close-btn:hover{background:#dc2626;color:#fff}
+  /* Sections */
+  .page{padding:24px;max-width:1200px;margin:0 auto}
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+  .page-title{font-size:1.4rem;font-weight:800;color:var(--elec)}
+  .page-sub{font-size:.82rem;color:#64748b;margin-top:2px}
+  /* Login */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--clay-bg);padding:20px}
+  .login-card{background:var(--glass);backdrop-filter:blur(20px);border-radius:28px;box-shadow:var(--shadow-clay);border:1px solid rgba(255,255,255,.85);padding:40px 36px;width:100%;max-width:400px;text-align:center}
+  .login-emblem{width:72px;height:72px;border-radius:22px;background:linear-gradient(135deg,var(--elec),var(--sky));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 24px rgba(21,85,217,.3)}
+  .login-emblem svg{fill:#fff}
+  .error-box{background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:10px 14px;color:#dc2626;font-size:.83rem;text-align:left;margin-bottom:14px}
+  /* Grid */
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:768px){.grid-4{grid-template-columns:repeat(2,1fr)}.grid-2{grid-template-columns:1fr}.nav-tabs{display:none}}
+  /* Attendance */
+  .pa-btn{width:40px;height:40px;border-radius:12px;border:2px solid;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.85rem;cursor:pointer;transition:.2s}
+  .pa-btn-p{border-color:#22c55e;background:#f0fdf4;color:#15803d}
+  .pa-btn-p.active{background:#22c55e;color:#fff;box-shadow:0 4px 12px rgba(34,197,94,.4)}
+  .pa-btn-a{border-color:#ef4444;background:#fef2f2;color:#dc2626}
+  .pa-btn-a.active{background:#ef4444;color:#fff;box-shadow:0 4px 12px rgba(239,68,68,.4)}
+  /* Progress */
+  .progress{height:8px;border-radius:4px;background:#E2E8F0;overflow:hidden;margin-top:6px}
+  .progress-bar{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--elec),var(--sky));transition:.5s}
+  /* Fee status */
+  .fee-paid{background:#F0FDF4;color:#15803D}
+  .fee-partial{background:#FFFBEB;color:#D97706}
+  .fee-pending{background:#FEF2F2;color:#DC2626}
+  /* Sections */
+  .section-label{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.8px;color:#94A3B8;margin:20px 0 10px}
+  .divider{height:1px;background:rgba(53,169,255,.12);margin:16px 0}
+  /* Loading */
+  .spinner{width:36px;height:36px;border:3px solid rgba(53,169,255,.2);border-top-color:var(--sky);border-radius:50%;animation:spin .7s linear infinite;margin:40px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  /* Cross btn */
+  .remove-btn{width:28px;height:28px;border-radius:50%;border:none;background:rgba(239,68,68,.1);color:#dc2626;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+  .remove-btn:hover{background:#dc2626;color:#fff;transform:scale(1.1)}
+  /* Demo login */
+  .demo-row{display:flex;gap:8px;margin-top:14px}
+  .demo-btn{flex:1;padding:9px 8px;border-radius:10px;border:1.5px solid rgba(53,169,255,.3);background:rgba(53,169,255,.06);cursor:pointer;font-size:.77rem;font-weight:700;color:var(--elec);transition:.2s}
+  .demo-btn:hover{background:rgba(21,85,217,.12);border-color:var(--elec)}
+  .empty-state{text-align:center;padding:48px 20px;color:#94A3B8}
+  .empty-state svg{margin-bottom:12px;opacity:.4}
+  .search-bar{position:relative}
+  .search-bar input{padding-left:36px}
+  .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94A3B8}
+  .fee-row-paid{background:rgba(240,253,244,.5)}
+  .fee-row-partial{background:rgba(255,251,235,.5)}
+  .fee-row-pending{background:rgba(254,242,242,.5)}
+  .sub-fee-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+  .sub-fee-row label{min-width:160px;margin:0;text-transform:none;font-size:.82rem;letter-spacing:0;font-weight:600;color:#374151}
+  .sub-fee-row input{text-align:right}
+  .total-fee-display{background:linear-gradient(135deg,rgba(21,85,217,.08),rgba(53,169,255,.08));border:1.5px solid rgba(53,169,255,.25);border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .total-label{font-size:.78rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px}
+  .total-amount{font-size:1.3rem;font-weight:900;color:var(--elec)}
+  .wa-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:8px;border:none;background:#25D366;color:#fff;font-size:.75rem;font-weight:700;cursor:pointer;transition:.2s}
+  .wa-btn:hover{background:#128C7E}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useCallback, useRef } = React;
+const API = '/api/v1';
+
+// ─── API Client ───────────────────────────────────────────────────────────────
+async function req(endpoint, opts = {}) {
+  const res = await fetch(`${API}${endpoint}`, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', ...(opts.headers || {}) }
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw Object.assign(new Error(data?.error || `Error ${res.status}`), { status: res.status });
+  return data;
+}
+
+const api = {
+  getBatches: () => req('/batches'),
+  createBatch: (d) => req('/batches', { method: 'POST', body: JSON.stringify(d) }),
+  getStudents: (p = {}) => req('/students?' + new URLSearchParams(p)),
+  createStudent: (d) => req('/students', { method: 'POST', body: JSON.stringify(d) }),
+  deleteStudent: (id) => req(`/students/${id}`, { method: 'DELETE' }),
+  getTeachers: () => req('/teachers'),
+  createTeacher: (d) => req('/teachers', { method: 'POST', body: JSON.stringify(d) }),
+  deleteTeacher: (id) => req(`/teachers/${id}`, { method: 'DELETE' }),
+  getRoster: (bid, date) => req(`/attendance/batch-roster?batch_id=${bid}&date=${date}`),
+  submitAttendance: (bid, date, records) => req('/attendance/submit', { method: 'POST', body: JSON.stringify({ batch_id: bid, date, records }) }),
+  getAbsentList: (bid, date) => req(`/attendance/absent-list?batch_id=${bid}&date=${date}`),
+  sendAbsentBroadcast: (bid, date) => req('/messages/send-absent-broadcast', { method: 'POST', body: JSON.stringify({ batch_id: bid, date }) }),
+  getDashStats: (date) => req(`/dashboard/stats?date=${date}`),
+  getBatchSummary: (date) => req(`/dashboard/batch-summary?date=${date}`),
+  getFees: (p = {}) => req('/fees?' + new URLSearchParams(p)),
+  getFeeSummary: () => req('/fees/summary'),
+  recordPayment: (d) => req('/fees/record-payment', { method: 'POST', body: JSON.stringify(d) }),
+  getSettings: () => req('/settings'),
+  updateSettings: (d) => req('/settings', { method: 'PUT', body: JSON.stringify(d) }),
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+const AVATAR_COLORS = [
+  ['#EFF6FF','#1D4ED8'],['#F0FDF4','#15803D'],['#FFF7ED','#C2410C'],
+  ['#FAF5FF','#7C3AED'],['#FFF1F2','#BE123C'],['#ECFDF5','#065F46'],
+];
+function avatarStyle(name) {
+  const i = (name || '').charCodeAt(0) % AVATAR_COLORS.length;
+  return { background: AVATAR_COLORS[i][0], color: AVATAR_COLORS[i][1] };
+}
+function initials(name) { return (name||'?').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2); }
+function today() { return new Date().toISOString().split('T')[0]; }
+function fmt(n) { return Number(n||0).toLocaleString('en-IN'); }
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+function Navbar({ page, setPage }) {
+  return (
+    <nav className="navbar">
+      <div className="nav-brand">Apex <span>Institute</span></div>
+      <div className="nav-tabs">
+        {TABS.map(t => <button key={t} className={`nav-tab${page===t?' active':''}`} onClick={()=>setPage(t)}>{t}</button>)}
+      </div>
+      <div className="nav-right">
+        <span style={{fontSize:'.8rem',color:'#64748b',fontWeight:600}}>Apex Institute</span>
+      </div>
+    </nav>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function DashboardPage() {
+  const [stats, setStats] = useState(null);
+  const [batches, setBatches] = useState([]);
+  useEffect(() => {
+    const d = today();
+    api.getDashStats(d).then(r => setStats(r.data)).catch(()=>{});
+    api.getBatchSummary(d).then(r => setBatches(r.data)).catch(()=>{});
+  }, []);
+
+  return (
+    <div className="page">
+      <div className="page-header"><div><div className="page-title">Dashboard Overview</div><div className="page-sub">{new Date().toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div></div></div>
+      <div className="grid-4">
+        {[
+          {label:'Total Students', val:stats?.total_students??'—'},
+          {label:'Total Batches', val:stats?.total_batches??'—'},
+          {label:'Present Today', val:stats?.present_today??'—'},
+          {label:'Absent Today', val:stats?.absent_today??'—'},
+        ].map(s => (
+          <div key={s.label} className="stat-card">
+            <div className="stat-num">{s.val}</div>
+            <div className="stat-label">{s.label}</div>
+          </div>
+        ))}
+      </div>
+      <div className="grid-2" style={{marginBottom:24}}>
+        <div className="stat-card"><div className="stat-num" style={{color:'#15803D'}}>&#8377; {fmt(stats?.fees_collected)}</div><div className="stat-label">Fees Collected</div></div>
+        <div className="stat-card"><div className="stat-num" style={{color:'#DC2626'}}>&#8377; {fmt(stats?.fees_pending)}</div><div className="stat-label">Fees Pending</div></div>
+      </div>
+      <div className="card">
+        <div style={{fontWeight:800,color:'#1555D9',marginBottom:16}}>Today's Batch Summary</div>
+        {batches.length === 0 ? <div className="empty-state">No batches data.</div> :
+          <table>
+            <thead><tr><th>Batch</th><th>Students</th><th>Present</th><th>Absent</th><th>Attendance</th></tr></thead>
+            <tbody>
+              {batches.map(b => {
+                const pct = b.total_students ? Math.round(b.present/b.total_students*100) : 0;
+                return (
+                  <tr key={b.id}>
+                    <td><b>{b.name}</b><br/><span style={{fontSize:'.75rem',color:'#94A3B8'}}>{b.timing}</span></td>
+                    <td>{b.total_students}</td>
+                    <td style={{color:'#15803D',fontWeight:700}}>{b.present}</td>
+                    <td style={{color:'#DC2626',fontWeight:700}}>{b.absent}</td>
+                    <td style={{width:140}}><div style={{fontSize:'.75rem',color:'#64748b',marginBottom:4}}>{pct}%</div><div className="progress"><div className="progress-bar" style={{width:pct+'%'}}/></div></td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Students Page ────────────────────────────────────────────────────────────
+const SUBJECT_MAP = {
+  '9':['Maths','Science','English','Hindi','Social Science'],
+  '10':['Maths','Science'],
+  'PCM':['Physics','Chemistry','Maths'],
+  'PCB':['Physics','Chemistry','Biology'],
+  'Commerce':['Accountancy','Business Studies','Economics'],
+};
+function getSubjects(cls, stream) {
+  if(cls==='9') return SUBJECT_MAP['9'];
+  if(cls==='10') return SUBJECT_MAP['10'];
+  if((cls==='11'||cls==='12')&&stream) return SUBJECT_MAP[stream]||[];
+  return [];
+}
+const EMPTY_FORM = {name:'',address:'',parentName:'',parentPhone:'+91',rollNo:'',studentClass:'',stream:'',board:'',batchId:'',subjectFees:{}};
+
+function StudentsPage() {
+  const [students, setStudents] = useState([]);
+  const [batches, setBatches] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [filterBatch, setFilterBatch] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [saving, setSaving] = useState(false);
+  const [confirmId, setConfirmId] = useState(null);
+  const [confirmName, setConfirmName] = useState('');
+
+  const subjects = getSubjects(form.studentClass, form.stream);
+  const needsStream = form.studentClass==='11'||form.studentClass==='12';
+  const totalFee = subjects.reduce((acc,s)=>acc+parseFloat(form.subjectFees[s]||0),0);
+
+  async function load() {
+    setLoading(true);
+    try {
+      const p = {};
+      if(filterBatch) p.batch_id = filterBatch;
+      if(search) p.search = search;
+      const [sr, br] = await Promise.all([api.getStudents(p), api.getBatches()]);
+      if(sr.success) setStudents(sr.data);
+      if(br.success) {
+        setBatches(br.data);
+        if(!form.batchId && br.data.length) setForm(f=>({...f,batchId:String(br.data[0].id)}));
+      }
+    } catch {}
+    setLoading(false);
+  }
+  useEffect(()=>{ load(); },[filterBatch,search]);
+
+  function openModal() { setForm(EMPTY_FORM); setShowModal(true); }
+
+  function setFee(subject, val) {
+    setForm(f=>({...f, subjectFees:{...f.subjectFees,[subject]:val}}));
+  }
+
+  async function handleSave() {
+    if(!form.name.trim()||!form.studentClass||!form.board||!form.batchId) return alert('Fill required fields.');
+    if(needsStream && !form.stream) return alert('Select a stream.');
+    setSaving(true);
+    try {
+      const subjectFeesArr = subjects.map(s=>({subject:s,fee:parseFloat(form.subjectFees[s]||0)}));
+      await api.createStudent({
+        name:form.name, address:form.address, roll_no:form.rollNo||undefined,
+        parent_name:form.parentName, parent_phone:form.parentPhone,
+        batch_id:form.batchId, student_class:form.studentClass, stream:form.stream||null,
+        board:form.board, subject_fees:subjectFeesArr, total_fee:totalFee
+      });
+      setShowModal(false);
+      load();
+    } catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  async function handleRemove() {
+    try { await api.deleteStudent(confirmId); setConfirmId(null); load(); }
+    catch(e) { alert(e.message); }
+  }
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div><div className="page-title">Students</div><div className="page-sub">{students.length} enrolled</div></div>
+        <button className="btn btn-primary" onClick={openModal}>+ Add Student</button>
+      </div>
+      {/* Filters */}
+      <div className="card" style={{marginBottom:16,padding:'14px 20px'}}>
+        <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+          <div style={{flex:1,minWidth:180}} className="search-bar">
+            <span className="search-icon">&#128269;</span>
+            <input placeholder="Search by name or roll no..." value={search} onChange={e=>{setSearch(e.target.value)}}/>
+          </div>
+          <select style={{width:200}} value={filterBatch} onChange={e=>setFilterBatch(e.target.value)}>
+            <option value="">All Batches</option>
+            {batches.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+        </div>
+      </div>
+      <div className="card">
+        {loading ? <div className="spinner"/> :
+          students.length===0 ? <div className="empty-state"><svg width="40" height="40" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg><div>No students found.</div></div> :
+          <table>
+            <thead><tr><th>Student</th><th>Class / Stream</th><th>Board</th><th>Batch</th><th>Total Fee</th><th>Remove</th></tr></thead>
+            <tbody>
+              {students.map(s=>{
+                const sc = s.stream ? STREAM_COLORS[s.stream] : null;
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <div style={{display:'flex',alignItems:'center',gap:10}}>
+                        <div className="avatar" style={avatarStyle(s.name)}>{initials(s.name)}</div>
+                        <div>
+                          <div style={{fontWeight:700}}>{s.name}</div>
+                          <div style={{fontSize:'.72rem',color:'#94A3B8'}}>{s.roll_no} · {s.parent_phone}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span className="pill pill-blue">Class {s.student_class}</span>
+                      {s.stream&&<span className="pill" style={{marginLeft:4,background:sc?.bg,color:sc?.text,border:`1px solid ${sc?.border}`}}>{s.stream}</span>}
+                    </td>
+                    <td><span className="pill pill-gray">{s.board||'—'}</span></td>
+                    <td style={{fontSize:'.8rem',color:'#374151'}}>{s.batch_name}</td>
+                    <td style={{fontWeight:700,color:'#1555D9'}}>&#8377; {fmt(s.total_fee)}</td>
+                    <td>
+                      <button className="remove-btn" onClick={()=>{setConfirmId(s.id);setConfirmName(s.name);}} title="Remove student">&#10005;</button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>}
+      </div>
+
+      {/* Add Student Modal */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <div className="modal-header">
+              <div className="modal-title">Enroll New Student</div>
+              <button className="close-btn" onClick={()=>setShowModal(false)}>&#10005;</button>
+            </div>
+            <div className="modal-body">
+              <div className="section-label">Student Details</div>
+              <div className="form-group"><label>Full Name *</label><input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="e.g. Anjali Singh"/></div>
+              <div className="form-group"><label>Address</label><input value={form.address} onChange={e=>setForm(f=>({...f,address:e.target.value}))} placeholder="Full address"/></div>
+              <div className="grid-2">
+                <div className="form-group"><label>Roll No</label><input value={form.rollNo} onChange={e=>setForm(f=>({...f,rollNo:e.target.value}))} placeholder="e.g. 10A01"/></div>
+                <div className="form-group"><label>Batch *</label>
+                  <select value={form.batchId} onChange={e=>setForm(f=>({...f,batchId:e.target.value}))}>
+                    <option value="">Select batch</option>
+                    {batches.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="divider"/>
+              <div className="section-label">Parent Details</div>
+              <div className="grid-2">
+                <div className="form-group"><label>Parent Name</label><input value={form.parentName} onChange={e=>setForm(f=>({...f,parentName:e.target.value}))} placeholder="Parent / Guardian"/></div>
+                <div className="form-group"><label>Parent Phone</label><input value={form.parentPhone} onChange={e=>setForm(f=>({...f,parentPhone:e.target.value}))} placeholder="+91 98765 43210"/></div>
+              </div>
+              <div className="divider"/>
+              <div className="section-label">Class & Board</div>
+              <div className="grid-2">
+                <div className="form-group"><label>Class *</label>
+                  <select value={form.studentClass} onChange={e=>setForm(f=>({...f,studentClass:e.target.value,stream:'',subjectFees:{}}))}>
+                    <option value="">Select class</option>
+                    {['9','10','11','12'].map(c=><option key={c} value={c}>Class {c}</option>)}
+                  </select>
+                </div>
+                <div className="form-group"><label>Board *</label>
+                  <select value={form.board} onChange={e=>setForm(f=>({...f,board:e.target.value}))}>
+                    <option value="">Select board</option>
+                    <option>UP Board</option><option>CBSE</option>
+                  </select>
+                </div>
+              </div>
+              {needsStream && (
+                <>
+                  <div className="section-label">Stream</div>
+                  <div style={{display:'flex',gap:8,marginBottom:16}}>
+                    {['PCM','PCB','Commerce'].map(s=>(
+                      <button key={s} onClick={()=>setForm(f=>({...f,stream:s,subjectFees:{}}))}
+                        style={{flex:1,padding:'9px 4px',borderRadius:10,border:`2px solid ${form.stream===s?'#1555D9':'rgba(53,169,255,.25)'}`,
+                          background:form.stream===s?'linear-gradient(135deg,#1555D9,#35A9FF)':'rgba(255,255,255,.8)',
+                          color:form.stream===s?'#fff':'#374151',fontWeight:700,cursor:'pointer',fontSize:'.83rem',transition:'.2s'}}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+              {subjects.length>0 && (
+                <>
+                  <div className="section-label">Subject-wise Fees (&#8377;)</div>
+                  {subjects.map(s=>(
+                    <div key={s} className="sub-fee-row">
+                      <label>{s}</label>
+                      <input type="number" placeholder="0" min="0" value={form.subjectFees[s]||''} onChange={e=>setFee(s,e.target.value)} style={{width:120,textAlign:'right'}}/>
+                    </div>
+                  ))}
+                  <div className="total-fee-display">
+                    <span className="total-label">Total Fee</span>
+                    <span className="total-amount">&#8377; {fmt(totalFee)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setShowModal(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={handleSave} disabled={saving}>{saving?'Saving...':'Enroll Student'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Confirm Remove Modal */}
+      {confirmId && (
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:380}}>
+            <div className="modal-header"><div className="modal-title">Remove Student</div><button className="close-btn" onClick={()=>setConfirmId(null)}>&#10005;</button></div>
+            <div className="modal-body" style={{textAlign:'center',padding:'30px 24px'}}>
+              <div style={{fontSize:3+'rem',marginBottom:12}}>&#9888;</div>
+              <p style={{fontWeight:600,marginBottom:8}}>Remove <strong>{confirmName}</strong>?</p>
+              <p style={{fontSize:'.83rem',color:'#64748b'}}>This student will be removed from active records. Attendance history is preserved.</p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setConfirmId(null)}>Cancel</button>
+              <button className="btn btn-danger" onClick={handleRemove}>Remove</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const STREAM_COLORS = {
+  PCM:{bg:'#EFF6FF',border:'#BFDBFE',text:'#1D4ED8'},
+  PCB:{bg:'#F0FDF4',border:'#BBF7D0',text:'#15803D'},
+  Commerce:{bg:'#FFF7ED',border:'#FED7AA',text:'#C2410C'},
+};
+
+// ─── Batches Page ─────────────────────────────────────────────────────────────
+function BatchesPage() {
+  const [batches, setBatches] = useState([]);
+  const [teachers, setTeachers] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({name:'',subject:'',timing:'',teacher_id:''});
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    const [br, tr] = await Promise.all([api.getBatches(), api.getTeachers()]);
+    if(br.success) setBatches(br.data);
+    if(tr.success) setTeachers(tr.data);
+  }
+  useEffect(()=>{ load(); },[]);
+
+  async function save() {
+    setSaving(true);
+    try { await api.createBatch(form); setShowModal(false); load(); }
+    catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div><div className="page-title">Batches</div><div className="page-sub">{batches.length} active</div></div>
+        <button className="btn btn-primary" onClick={()=>{setForm({name:'',subject:'',timing:'',teacher_id:''});setShowModal(true)}}>+ Add Batch</button>
+      </div>
+      <div className="card">
+        <table>
+          <thead><tr><th>Batch Name</th><th>Subject</th><th>Timing</th><th>Teacher</th><th>Status</th></tr></thead>
+          <tbody>
+            {batches.map(b=>(
+              <tr key={b.id}>
+                <td><b>{b.name}</b></td>
+                <td>{b.subject}</td>
+                <td>{b.timing}</td>
+                <td>{b.teacher_name||'—'}</td>
+                <td><span className={`pill ${b.status==='active'?'pill-green':'pill-gray'}`}>{b.status}</span></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {showModal&&(
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:420}}>
+            <div className="modal-header"><div className="modal-title">Add Batch</div><button className="close-btn" onClick={()=>setShowModal(false)}>&#10005;</button></div>
+            <div className="modal-body">
+              <div className="form-group"><label>Batch Name *</label><input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="e.g. Class 10 Morning"/></div>
+              <div className="form-group"><label>Subject(s)</label><input value={form.subject} onChange={e=>setForm(f=>({...f,subject:e.target.value}))} placeholder="e.g. Maths & Science"/></div>
+              <div className="form-group"><label>Timing</label><input value={form.timing} onChange={e=>setForm(f=>({...f,timing:e.target.value}))} placeholder="e.g. 7:00 AM - 9:00 AM"/></div>
+              <div className="form-group"><label>Assign Teacher</label>
+                <select value={form.teacher_id} onChange={e=>setForm(f=>({...f,teacher_id:e.target.value}))}>
+                  <option value="">Select teacher</option>
+                  {teachers.map(t=><option key={t.id} value={t.id}>{t.name}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setShowModal(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?'Saving...':'Create Batch'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Teachers Page ────────────────────────────────────────────────────────────
+function TeachersPage() {
+  const [teachers, setTeachers] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [form, setForm] = useState({name:'',email:'',phone:'',password:'teacher123'});
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    const r = await api.getTeachers().catch(()=>({}));
+    if(r.success) setTeachers(r.data);
+  }
+  useEffect(()=>{ load(); },[]);
+
+  async function save() {
+    setSaving(true);
+    try { await api.createTeacher(form); setShowModal(false); load(); }
+    catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  async function remove(id) {
+    if(!confirm('Remove this teacher?')) return;
+    await api.deleteTeacher(id).catch(()=>{});
+    load();
+  }
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div><div className="page-title">Teachers</div></div>
+        <button className="btn btn-primary" onClick={()=>{setForm({name:'',email:'',phone:'',password:'teacher123'});setShowModal(true)}}>+ Add Teacher</button>
+      </div>
+      <div className="card">
+        <table>
+          <thead><tr><th>Teacher</th><th>Email</th><th>Phone</th><th>Status</th><th>Remove</th></tr></thead>
+          <tbody>
+            {teachers.map(t=>(
+              <tr key={t.id}>
+                <td><div style={{display:'flex',alignItems:'center',gap:10}}><div className="avatar" style={avatarStyle(t.name)}>{initials(t.name)}</div><b>{t.name}</b></div></td>
+                <td>{t.email}</td>
+                <td>{t.phone}</td>
+                <td><span className={`pill ${t.status==='active'?'pill-green':'pill-gray'}`}>{t.status}</span></td>
+                <td><button className="remove-btn" onClick={()=>remove(t.id)}>&#10005;</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {showModal&&(
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:400}}>
+            <div className="modal-header"><div className="modal-title">Add Teacher</div><button className="close-btn" onClick={()=>setShowModal(false)}>&#10005;</button></div>
+            <div className="modal-body">
+              <div className="form-group"><label>Name *</label><input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Teacher name"/></div>
+              <div className="form-group"><label>Email *</label><input type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} placeholder="teacher@apex.com"/></div>
+              <div className="form-group"><label>Phone</label><input value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} placeholder="+91 98765 43210"/></div>
+              <div className="form-group"><label>Password</label><input value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))}/></div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setShowModal(false)}>Cancel</button>
+              <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?'Saving...':'Add Teacher'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Attendance Page ──────────────────────────────────────────────────────────
+function AttendancePage({ user }) {
+  const [batches, setBatches] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState(null);
+  const [date, setDate] = useState(today());
+  const [roster, setRoster] = useState([]);
+  const [attendance, setAttendance] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [showAbsent, setShowAbsent] = useState(false);
+  const [absentList, setAbsentList] = useState([]);
+  const [sending, setSending] = useState(false);
+
+  useEffect(()=>{ api.getBatches().then(r=>{ if(r.success){ setBatches(r.data); if(r.data.length) setSelectedBatch(r.data[0]); }}); },[]);
+  useEffect(()=>{ if(selectedBatch) loadRoster(); },[selectedBatch,date]);
+
+  async function loadRoster() {
+    setLoading(true); setSaved(false);
+    const r = await api.getRoster(selectedBatch.id, date).catch(()=>({}));
+    if(r.success) {
+      setRoster(r.data);
+      const att = {};
+      r.data.forEach(s=>{ att[s.id]=s.attendance_status||null; });
+      setAttendance(att);
+    }
+    setLoading(false);
+  }
+
+  function mark(id, status) { setAttendance(a=>({...a,[id]:status})); }
+
+  async function submit() {
+    setSaving(true);
+    const records = roster.map(s=>({student_id:s.id,status:attendance[s.id]||'P'}));
+    try { await api.submitAttendance(selectedBatch.id, date, records); setSaved(true); }
+    catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  async function openAbsent() {
+    const r = await api.getAbsentList(selectedBatch.id, date).catch(()=>({data:[]}));
+    setAbsentList(r.data||[]); setShowAbsent(true);
+  }
+
+  async function sendAlerts() {
+    setSending(true);
+    try {
+      const r = await api.sendAbsentBroadcast(selectedBatch.id, date);
+      alert(`WhatsApp alerts sent to ${r.data.sent} parents (mock mode).`);
+      setShowAbsent(false);
+    } catch(e) { alert(e.message); }
+    setSending(false);
+  }
+
+  const presentCount = Object.values(attendance).filter(v=>v==='P').length;
+  const absentCount = Object.values(attendance).filter(v=>v==='A').length;
+  const markedCount = roster.filter(s=>attendance[s.id]).length;
+
+  return (
+    <div className="page">
+      <div className="page-header">
+        <div><div className="page-title">Mark Attendance</div></div>
+      </div>
+      {/* Controls */}
+      <div className="card" style={{marginBottom:16,padding:'14px 20px'}}>
+        <div style={{display:'flex',gap:10,alignItems:'center',flexWrap:'wrap'}}>
+          <select style={{flex:1,minWidth:180}} value={selectedBatch?.id||''} onChange={e=>{const b=batches.find(b=>b.id==e.target.value);setSelectedBatch(b);}}>
+            {batches.map(b=><option key={b.id} value={b.id}>{b.name}</option>)}
+          </select>
+          <input type="date" style={{width:160}} value={date} onChange={e=>setDate(e.target.value)}/>
+          <button className="btn btn-ghost btn-sm" onClick={openAbsent}>Absent List</button>
+          <button className="btn btn-primary btn-sm" onClick={submit} disabled={saving||!roster.length}>{saving?'Saving...':'Save Attendance'}</button>
+          {saved&&<span style={{color:'#15803D',fontSize:'.82rem',fontWeight:700}}>Saved!</span>}
+        </div>
+      </div>
+      {/* Live Counter */}
+      {roster.length>0&&(
+        <div style={{display:'flex',gap:12,marginBottom:16}}>
+          <div className="stat-card" style={{flex:1,padding:'12px 16px'}}><div className="stat-num" style={{fontSize:'1.5rem',color:'#15803D'}}>{presentCount}</div><div className="stat-label">Present</div></div>
+          <div className="stat-card" style={{flex:1,padding:'12px 16px'}}><div className="stat-num" style={{fontSize:'1.5rem',color:'#DC2626'}}>{absentCount}</div><div className="stat-label">Absent</div></div>
+          <div className="stat-card" style={{flex:1,padding:'12px 16px'}}><div className="stat-num" style={{fontSize:'1.5rem'}}>{roster.length-markedCount}</div><div className="stat-label">Unmarked</div></div>
+        </div>
+      )}
+      <div className="card">
+        {loading ? <div className="spinner"/> : roster.length===0 ? <div className="empty-state">No students in this batch.</div> :
+          <table>
+            <thead><tr><th>Student</th><th>Roll</th><th style={{textAlign:'center'}}>P</th><th style={{textAlign:'center'}}>A</th></tr></thead>
+            <tbody>
+              {roster.map(s=>(
+                <tr key={s.id}>
+                  <td><div style={{display:'flex',alignItems:'center',gap:8}}><div className="avatar" style={{...avatarStyle(s.name),width:32,height:32,fontSize:'.72rem'}}>{initials(s.name)}</div><span style={{fontWeight:600}}>{s.name}</span></div></td>
+                  <td style={{fontSize:'.78rem',color:'#94A3B8'}}>{s.roll_no}</td>
+                  <td style={{textAlign:'center'}}><button className={`pa-btn pa-btn-p${attendance[s.id]==='P'?' active':''}`} onClick={()=>mark(s.id,'P')}>P</button></td>
+                  <td style={{textAlign:'center'}}><button className={`pa-btn pa-btn-a${attendance[s.id]==='A'?' active':''}`} onClick={()=>mark(s.id,'A')}>A</button></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>}
+      </div>
+      {showAbsent&&(
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:420}}>
+            <div className="modal-header"><div className="modal-title">Absent Students — {date}</div><button className="close-btn" onClick={()=>setShowAbsent(false)}>&#10005;</button></div>
+            <div className="modal-body">
+              {absentList.length===0?<div style={{textAlign:'center',color:'#64748b',padding:20}}>No absent students.</div>:
+                absentList.map(s=>(
+                  <div key={s.id} style={{display:'flex',alignItems:'center',gap:10,padding:'10px 0',borderBottom:'1px solid rgba(53,169,255,.1)'}}>
+                    <div className="avatar" style={avatarStyle(s.name)}>{initials(s.name)}</div>
+                    <div style={{flex:1}}><div style={{fontWeight:700}}>{s.name}</div><div style={{fontSize:'.75rem',color:'#94A3B8'}}>{s.parent_phone}</div></div>
+                    <a href={`https://wa.me/${(s.parent_phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(`Dear Parent, ${s.name} was absent on ${date}. - Apex Institute`)}`} target="_blank" className="wa-btn">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                      WhatsApp
+                    </a>
+                  </div>
+                ))}
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setShowAbsent(false)}>Close</button>
+              {absentList.length>0&&<button className="btn btn-primary" onClick={sendAlerts} disabled={sending}>{sending?'Sending...':'Send All WhatsApp Alerts'}</button>}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Fees Page ────────────────────────────────────────────────────────────────
+function FeesPage() {
+  const [fees, setFees] = useState([]);
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [payModal, setPayModal] = useState(null);
+  const [payForm, setPayForm] = useState({amount:'',mode:'Cash',notes:''});
+  const [saving, setSaving] = useState(false);
+
+  async function load() {
+    setLoading(true);
+    const [fr, sr] = await Promise.all([api.getFees(), api.getFeeSummary()]);
+    if(fr.success) setFees(fr.data);
+    if(sr.success) setSummary(sr.data);
+    setLoading(false);
+  }
+  useEffect(()=>{ load(); },[]);
+
+  async function savePayment() {
+    if(!payForm.amount||parseFloat(payForm.amount)<=0) return alert('Enter valid amount.');
+    setSaving(true);
+    try {
+      await api.recordPayment({student_id:payModal.student_id, amount:parseFloat(payForm.amount), payment_mode:payForm.mode, notes:payForm.notes, receipt_number:`RCP-${Date.now()}`});
+      setPayModal(null); setPayForm({amount:'',mode:'Cash',notes:''}); load();
+    } catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  const feeStatusStyle = (st) => st==='Paid'?'fee-paid':st==='Partial'?'fee-partial':'fee-pending';
+
+  return (
+    <div className="page">
+      <div className="page-header"><div className="page-title">Fee Tracking</div></div>
+      {summary&&(
+        <div className="grid-4" style={{marginBottom:24}}>
+          {[
+            {label:'Total Fee',val:'₹ '+fmt(summary.total_fee),c:'#1555D9'},
+            {label:'Collected',val:'₹ '+fmt(summary.amount_collected),c:'#15803D'},
+            {label:'Pending',val:'₹ '+fmt(summary.amount_pending),c:'#DC2626'},
+            {label:'Paid / Partial / Due',val:`${summary.paid_count} / ${summary.partial_count} / ${summary.pending_count}`,c:'#374151'},
+          ].map(s=>(
+            <div key={s.label} className="stat-card"><div className="stat-num" style={{color:s.c,fontSize:'1.3rem'}}>{s.val}</div><div className="stat-label">{s.label}</div></div>
+          ))}
+        </div>
+      )}
+      <div className="card">
+        {loading?<div className="spinner"/>:
+          <table>
+            <thead><tr><th>Student</th><th>Batch</th><th>Total</th><th>Paid</th><th>Balance</th><th>Status</th><th>Action</th></tr></thead>
+            <tbody>
+              {fees.map(f=>(
+                <tr key={f.id} className={`fee-row-${f.status?.toLowerCase()}`}>
+                  <td><b>{f.student_name}</b><br/><span style={{fontSize:'.72rem',color:'#94A3B8'}}>{f.parent_phone}</span></td>
+                  <td style={{fontSize:'.8rem'}}>{f.batch_name}</td>
+                  <td style={{fontWeight:600}}>&#8377; {fmt(f.total_fee)}</td>
+                  <td style={{color:'#15803D',fontWeight:600}}>&#8377; {fmt(f.amount_paid)}</td>
+                  <td style={{color:'#DC2626',fontWeight:700}}>&#8377; {fmt(f.total_fee-f.amount_paid)}</td>
+                  <td><span className={`pill ${feeStatusStyle(f.status)}`}>{f.status}</span></td>
+                  <td>
+                    {f.status!=='Paid'&&<button className="btn btn-primary btn-xs" onClick={()=>{setPayModal(f);setPayForm({amount:'',mode:'Cash',notes:''});}}>Pay</button>}
+                    {f.parent_phone&&f.status!=='Paid'&&<a href={`https://wa.me/${(f.parent_phone||'').replace(/[^0-9]/g,'')}?text=${encodeURIComponent(`Dear Parent, fees of ₹${fmt(f.total_fee-f.amount_paid)} are pending. Please pay at the earliest. - Apex Institute`)}`} target="_blank" className="wa-btn" style={{marginLeft:6,display:'inline-flex'}}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    </a>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>}
+      </div>
+      {payModal&&(
+        <div className="modal-overlay">
+          <div className="modal" style={{maxWidth:380}}>
+            <div className="modal-header"><div className="modal-title">Record Payment — {payModal.student_name}</div><button className="close-btn" onClick={()=>setPayModal(null)}>&#10005;</button></div>
+            <div className="modal-body">
+              <div style={{background:'rgba(53,169,255,.08)',border:'1px solid rgba(53,169,255,.2)',borderRadius:10,padding:'10px 14px',marginBottom:16,fontSize:'.83rem'}}>
+                Balance due: <strong>&#8377; {fmt(payModal.total_fee-payModal.amount_paid)}</strong>
+              </div>
+              <div className="form-group"><label>Amount (&#8377;) *</label><input type="number" value={payForm.amount} onChange={e=>setPayForm(f=>({...f,amount:e.target.value}))} placeholder="Enter amount"/></div>
+              <div className="form-group"><label>Payment Mode</label>
+                <select value={payForm.mode} onChange={e=>setPayForm(f=>({...f,mode:e.target.value}))}>
+                  <option>Cash</option><option>UPI</option><option>NEFT</option><option>Cheque</option>
+                </select>
+              </div>
+              <div className="form-group"><label>Notes</label><input value={payForm.notes} onChange={e=>setPayForm(f=>({...f,notes:e.target.value}))} placeholder="Optional note"/></div>
+            </div>
+            <div className="modal-footer">
+              <button className="btn btn-ghost" onClick={()=>setPayModal(null)}>Cancel</button>
+              <button className="btn btn-primary" onClick={savePayment} disabled={saving}>{saving?'Saving...':'Record Payment'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Settings Page ────────────────────────────────────────────────────────────
+function SettingsPage() {
+  const [settings, setSettings] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(()=>{ api.getSettings().then(r=>{ if(r.success) setSettings(r.data); }); },[]);
+
+  async function save() {
+    setSaving(true);
+    try { await api.updateSettings(settings); setSaved(true); setTimeout(()=>setSaved(false),3000); }
+    catch(e) { alert(e.message); }
+    setSaving(false);
+  }
+
+  if(!settings) return <div className="page"><div className="spinner"/></div>;
+
+  const f = (key) => ({value:settings[key]||'', onChange:e=>setSettings(s=>({...s,[key]:e.target.value}))});
+
+  return (
+    <div className="page">
+      <div className="page-header"><div className="page-title">Settings</div></div>
+      <div className="card" style={{maxWidth:600}}>
+        <div className="section-label">Institute Info</div>
+        <div className="form-group"><label>Institute Name</label><input {...f('institute_name')}/></div>
+        <div className="form-group"><label>Institute Phone</label><input {...f('institute_phone')}/></div>
+        <div className="form-group"><label>Institute Address</label><input {...f('institute_address')}/></div>
+        <div className="divider"/>
+        <div className="section-label">WhatsApp</div>
+        <div className="form-group"><label>Provider</label>
+          <select value={settings.whatsapp_provider||'mock'} onChange={e=>setSettings(s=>({...s,whatsapp_provider:e.target.value}))}>
+            <option value="mock">Mock (Dev / Demo)</option>
+            <option value="meta">Meta Cloud API</option>
+            <option value="gupshup">Gupshup</option>
+            <option value="wati">WATI</option>
+            <option value="aisensy">AiSensy</option>
+          </select>
+        </div>
+        <div className="form-group"><label>Absent Alert Message Template</label>
+          <textarea rows={3} style={{resize:'vertical'}} {...f('absent_message_template')}/>
+        </div>
+        <div style={{display:'flex',gap:10,marginTop:8}}>
+          <button className="btn btn-primary" onClick={save} disabled={saving}>{saving?'Saving...':'Save Settings'}</button>
+          {saved&&<span style={{color:'#15803D',fontWeight:700,fontSize:'.83rem',alignSelf:'center'}}>Settings saved!</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── App Root ─────────────────────────────────────────────────────────────────
+const TABS = ['Dashboard','Students','Batches','Teachers','Attendance','Fees','Settings'];
+
+function App() {
+  const [page, setPage] = useState('Dashboard');
+
+  return (
+    <>
+      <Navbar page={page} setPage={setPage}/>
+      {page==='Dashboard'  && <DashboardPage/>}
+      {page==='Students'   && <StudentsPage/>}
+      {page==='Batches'    && <BatchesPage/>}
+      {page==='Teachers'   && <TeachersPage/>}
+      {page==='Attendance' && <AttendancePage/>}
+      {page==='Fees'       && <FeesPage/>}
+      {page==='Settings'   && <SettingsPage/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

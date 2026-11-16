@@ -16,7 +16,7 @@ __pycache__/
 *.pyc
 
 # Build files
-dist/
+# dist/
 build/
 
 # Logs
