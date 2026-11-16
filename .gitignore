@@ -10,10 +10,10 @@ node_modules/
 frontend/node_modules/
 backend/node_modules/
 
-# Build files
-frontend/dist/
+# Build files — keep dist since we use it as standalone frontend
+# frontend/dist/
 
-# Local database and data
+# Local database and data — excluded (auto-generated on first run)
 backend/data/store.json
 
 # Logs

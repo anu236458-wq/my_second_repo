@@ -194,7 +194,17 @@
       "created_at": "2026-04-01T00:00:00Z"
     }
   ],
-  "attendance": [],
+  "attendance": [
+    {
+      "id": 1794842196026,
+      "student_id": 2,
+      "batch_id": 1,
+      "date": "2026-11-16",
+      "status": "A",
+      "marked_by": 1,
+      "created_at": "2026-11-16T15:16:36.051454Z"
+    }
+  ],
   "message_logs": [],
   "fees": [
     {

@@ -237,25 +237,12 @@ class Handler(BaseHTTPRequestHandler):
                 return {}
         return {}
 
-    def get_user(self) -> dict | None:
-        auth = self.headers.get("Authorization", "")
-        if not auth.startswith("Bearer "):
-            return None
-        token = auth[7:]
-        return jwt_verify(token, JWT_SECRET)
+    # Auth removed — all routes are public
+    def require_auth(self):
+        return {"id": 1, "name": "Admin", "role": "ADMIN"}
 
-    def require_auth(self) -> dict | None:
-        user = self.get_user()
-        if not user:
-            self.send_json(401, {"success": False, "error": "Authentication required."})
-        return user
-
-    def require_admin(self) -> dict | None:
-        user = self.require_auth()
-        if user and user.get("role") != "ADMIN":
-            self.send_json(403, {"success": False, "error": "Admin access required."})
-            return None
-        return user
+    def require_admin(self):
+        return {"id": 1, "name": "Admin", "role": "ADMIN"}
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -321,34 +308,6 @@ class Handler(BaseHTTPRequestHandler):
     # ─────────────────────────────────────────
     def handle_api(self, method: str, path: str, qs: dict):
         global store
-
-        # ── Auth ──────────────────────────────
-        if path == "/auth/login" and method == "POST":
-            body = self.read_body()
-            email = (body.get("email") or "").strip().lower()
-            password = body.get("password") or ""
-            if not email or not password:
-                return self.send_json(400, {"success": False, "error": "Email and password are required."})
-            user = next((u for u in store["users"] if u["email"].lower() == email), None)
-            if not user:
-                return self.send_json(401, {"success": False, "error": "Invalid credentials. Please verify your email and password."})
-            if user.get("status") != "active":
-                return self.send_json(403, {"success": False, "error": "Account has been deactivated."})
-            if not check_password(password, user["password_hash"]):
-                return self.send_json(401, {"success": False, "error": "Invalid credentials. Please verify your email and password."})
-            token = jwt_sign({"id": user["id"], "email": user["email"], "role": user["role"], "name": user["name"]}, JWT_SECRET)
-            return self.send_json(200, {"success": True, "message": "Login successful.", "data": {
-                "token": token,
-                "user": {"id": user["id"], "name": user["name"], "email": user["email"], "phone": user.get("phone"), "role": user["role"]}
-            }})
-
-        if path == "/auth/me" and method == "GET":
-            u = self.require_auth()
-            if not u: return
-            assigned_batches = []
-            if u.get("role") == "TEACHER":
-                assigned_batches = [b for b in store["batches"] if b.get("teacher_id") == u["id"] and b.get("status") == "active"]
-            return self.send_json(200, {"success": True, "data": {"user": u, "assignedBatches": assigned_batches}})
 
         # ── Batches ───────────────────────────
         if path == "/batches" and method == "GET":
